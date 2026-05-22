@@ -120,7 +120,7 @@
     height: 42px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2.5px solid #ffffff;   /* Changed to solid white */
+    border: 2.5px solid #ffffff;
     box-shadow: 0 2px 12px rgba(0,0,0,0.4);
     flex-shrink: 0;
   }
@@ -378,6 +378,18 @@
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
   </div>
 
+  <!-- Action Buttons Panel (Moved here) -->
+  <div class="panel">
+    <div class="action-row">
+      <button class="btn-save" id="saveBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save
+      </button>
+      <button class="btn-copy" id="copyBtn" title="Copy text">📋</button>
+      <button class="btn-caption" id="captionBtn"># Caption</button>
+    </div>
+  </div>
+
   <!-- Theme Panel -->
   <div class="panel">
     <div class="panel-label">🎨 Background Theme</div>
@@ -407,18 +419,6 @@
 
     <div class="panel-label" style="margin-top:2px;">Alignment</div>
     <div class="align-row" id="alignRow"></div>
-  </div>
-
-  <!-- Tools Panel -->
-  <div class="panel">
-    <div class="action-row">
-      <button class="btn-save" id="saveBtn">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Save
-      </button>
-      <button class="btn-copy" id="copyBtn" title="Copy text">📋</button>
-      <button class="btn-caption" id="captionBtn"># Caption</button>
-    </div>
   </div>
 
 </div>
