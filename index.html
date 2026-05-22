@@ -321,6 +321,25 @@
     background: rgba(255,255,255,0.15);
   }
 
+  .btn-generate {
+    background: rgba(52, 152, 219, 0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+  .btn-generate:hover {
+    background: rgba(52, 152, 219, 0.25);
+    transform: translateY(-1px);
+  }
+  .btn-generate:active {
+    transform: scale(0.96);
+  }
+
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
     background: #1e1e2e; border: 1px solid rgba(255,255,255,0.12);
@@ -373,7 +392,10 @@
   <div class="panel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
       <div class="panel-label">✏️ Your Text</div>
-      <button class="btn-clear" id="clearBtn">Clear</button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn-clear" id="clearBtn">Clear</button>
+        <button class="btn-generate" id="generateBtn">✨ Generate</button>
+      </div>
     </div>
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
   </div>
@@ -433,6 +455,7 @@
 const CAPTION_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/b9683982694b53a52a71bcea1f8120ea/raw/91437ec06cde284c6966f29cc36f5c355a18a07c/capt.txt';
 const CTA_GIST_URL     = 'https://gist.githubusercontent.com/h4ck3rtk-art/24ce8ca77149ed9574db1f6a5a7aefe3/raw/98878ad48efee3ce86ca8589f3d737961d95229c/cta.txt';
 const HASHTAG_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/3189f50395467c0030029a9353fe4048/raw/f32e3a57ba23ab457dfe37b110c634e88778c704/gistfile1.txt';
+const ONELINER_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/5f48ea50221c1036afa82481448cea64/raw/4710fce14ad30dd3546791a9839672c5cd03d885/gistfile1.txt';
 // ========================================================
 
 const THEMES = [
@@ -508,6 +531,38 @@ sizeSlider.addEventListener('input', () => {
 document.getElementById('clearBtn').addEventListener('click', () => {
   document.getElementById('textInput').value = '';
   document.getElementById('postText').textContent = '';
+});
+
+// Generate button - random one-liner from gist
+document.getElementById('generateBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('generateBtn');
+  const originalText = btn.textContent;
+  btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
+
+  try {
+    const res = await fetch(ONELINER_GIST_URL);
+    if (!res.ok) throw new Error('Failed to fetch');
+    const text = await res.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    if (lines.length === 0) {
+      showToast('No lines found in gist!');
+      return;
+    }
+
+    const randomLine = lines[Math.floor(Math.random() * lines.length)];
+    document.getElementById('textInput').value = randomLine;
+    syncText(); // update preview
+    showToast('✨ One-liner generated!');
+
+  } catch (err) {
+    showToast('Failed to generate from gist');
+    console.error(err);
+  } finally {
+    btn.style.opacity = '1';
+    btn.textContent = originalText;
+  }
 });
 
 // # Caption button
