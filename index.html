@@ -1,46 +1,617 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        main {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            line-height: 1.6;
-            color: #666;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tharrkey Post Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --accent: #3498db;           /* Changed to Blue */
+    --accent2: #2980b9;
+    --accent-glow: rgba(52, 152, 219, 0.35);
+    --gold: #f1c40f;
+    --text: #f0f0f5;
+    --muted: #8888aa;
+    --border: rgba(255,255,255,0.07);
+    --radius: 18px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 60px 0;
+    overflow-x: hidden;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 24px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #8e44ad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+  .header h1 {
+    font-size: 1.15rem; font-weight: 700;
+    background: linear-gradient(90deg, #fff 30%, var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px;
+  }
+  .header span {
+    margin-left: auto;
+    font-size: 0.7rem; color: var(--muted);
+    font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .main {
+    width: 100%; max-width: 480px;
+    padding: 0 16px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+
+  .preview-wrap {
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+
+  .post-card {
+    width: 100%;
+    max-width: 360px;
+    border-radius: 20px;
+    padding: 20px 22px 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
+    min-height: 160px;
+    aspect-ratio: 9 / 16;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 0.3s, box-shadow 0.3s;
+    cursor: default;
+    user-select: none;
+  }
+  .post-card::before {
+    content:'';
+    position: absolute; inset: 0;
+    background: inherit;
+    z-index: 0;
+  }
+  .post-card > * { position: relative; z-index: 1; }
+
+  .post-card::after {
+    content:'';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 2; opacity: 0.5;
+  }
+
+  .post-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-top: 8px;
+  }
+  .post-handle {
+    font-size: 1.05rem;
+    font-weight: 700;
+    opacity: 0.95;
+    letter-spacing: 0.5px;
+  }
+
+  .post-text {
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: center;
+    padding: 4px 0 6px;
+    word-break: break-word;
+    letter-spacing: -0.3px;
+    min-height: 40px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .post-text:empty::before {
+    content: attr(data-placeholder);
+    opacity: 0.3;
+    font-style: italic;
+  }
+
+  .theme-crimson { background: linear-gradient(145deg, #8b1a1a 0%, #c0392b 60%, #7b241c 100%); }
+  .theme-midnight { background: linear-gradient(145deg, #0d0221 0%, #1a1a2e 50%, #16213e 100%); }
+  .theme-rose     { background: linear-gradient(145deg, #4a0010 0%, #a0003a 55%, #5a0020 100%); }
+  .theme-slate    { background: linear-gradient(145deg, #1a1f2e 0%, #2e3650 55%, #1a2030 100%); }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .panel-label {
+    font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--muted);
+  }
+
+  .text-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .text-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .text-input::placeholder { color: var(--muted); font-size: 0.85rem; }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .theme-dot {
+    height: 36px; border-radius: 10px;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    position: relative; overflow: hidden;
+  }
+  .theme-dot.active {
+    border-color: white;
+    box-shadow: 0 0 0 2px var(--accent);
+    transform: scale(1.06);
+  }
+  .theme-dot:active { transform: scale(0.93); }
+
+  .theme-dot.theme-crimson { background: linear-gradient(135deg, #8b1a1a, #c0392b); }
+  .theme-dot.theme-midnight { background: linear-gradient(135deg, #0d0221, #1a1a2e); }
+  .theme-dot.theme-rose     { background: linear-gradient(135deg, #4a0010, #a0003a); }
+  .theme-dot.theme-slate    { background: linear-gradient(135deg, #1a1f2e, #2e3650); }
+
+  .font-select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.92rem;
+    padding: 10px 14px;
+    outline: none;
+    cursor: pointer;
+  }
+  .font-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .size-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .size-slider {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+  .size-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 52px;
+    text-align: right;
+  }
+
+  .align-row { display: flex; gap: 8px; }
+  .align-btn {
+    flex: 1; height: 38px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 0.95rem;
+  }
+  .align-btn.active { background: var(--accent); border-color: var(--accent); }
+  .align-btn:active { opacity: 0.75; }
+
+  .action-row {
+    display: flex; gap: 10px;
+  }
+  .btn-save {
+    flex: 1; padding: 14px 0;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), #2980b9);
+    color: white; font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--accent-glow);
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    letter-spacing: 0.3px;
+  }
+  .btn-save:active { opacity: 0.8; transform: scale(0.97); box-shadow: 0 2px 10px var(--accent-glow); }
+  .btn-copy {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .btn-caption {
+    padding: 0 16px;
+    height: 52px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.15s, transform 0.15s;
+    white-space: nowrap;
+  }
+  .btn-caption:active { background: rgba(255,255,255,0.15); transform: scale(0.97); }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1e1e2e; border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text); padding: 12px 22px;
+    border-radius: 30px; font-size: 0.85rem; font-weight: 600;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+    opacity: 0; z-index: 999; pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .divider {
+    height: 1px; background: var(--border); margin: 2px 0;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  }
+</style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to DQ</h1>
-    </header>
-    <main>
-        <h2>Hello World!</h2>
-        <p>This is your index.html page. Feel free to customize it with your own content.</p>
-    </main>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">✨</div>
+  <h1>Post Creator</h1>
+  <span>@tharrkey</span>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Post Preview -->
+  <div class="preview-wrap">
+    <div class="post-card theme-crimson" id="postCard">
+      <div class="post-author">
+        <div class="post-handle" id="postHandle">@tharrkey</div>
+      </div>
+      <div class="post-text" id="postText" data-placeholder="Write your thought here...">Write something amazing ✨</div>
+    </div>
+  </div>
+
+  <!-- Text Input Panel -->
+  <div class="panel">
+    <div class="panel-label">✏️ Your Text</div>
+    <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
+  </div>
+
+  <!-- Theme Panel -->
+  <div class="panel">
+    <div class="panel-label">🎨 Background Theme</div>
+    <div class="theme-grid" id="themeGrid"></div>
+  </div>
+
+  <!-- Style Panel -->
+  <div class="panel">
+    <div class="panel-label">🔤 Font Family</div>
+    <select class="font-select" id="fontSelect">
+      <option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Pacifico', cursive">Pacifico</option>
+      <option value="'Montserrat', sans-serif">Montserrat</option>
+      <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+    </select>
+
+    <div class="divider"></div>
+
+    <div class="panel-label">📐 Text Size</div>
+    <div class="size-slider-container">
+      <input type="range" id="sizeSlider" class="size-slider" 
+             min="0.9" max="2.6" step="0.05" value="1.45">
+      <span class="size-value" id="sizeValue">1.45rem</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="panel-label" style="margin-top:2px;">Alignment</div>
+    <div class="align-row" id="alignRow"></div>
+  </div>
+
+  <!-- Tools Panel -->
+  <div class="panel">
+    <div class="action-row">
+      <button class="btn-save" id="saveBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save
+      </button>
+      <button class="btn-copy" id="copyBtn" title="Copy text">📋</button>
+      <button class="btn-caption" id="captionBtn"># Caption</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Copied!</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+// ==================== GIST LINKS ====================
+const CAPTION_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/b9683982694b53a52a71bcea1f8120ea/raw/91437ec06cde284c6966f29cc36f5c355a18a07c/capt.txt';
+const CTA_GIST_URL     = 'https://gist.githubusercontent.com/h4ck3rtk-art/24ce8ca77149ed9574db1f6a5a7aefe3/raw/98878ad48efee3ce86ca8589f3d737961d95229c/cta.txt';
+const HASHTAG_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/3189f50395467c0030029a9353fe4048/raw/f32e3a57ba23ab457dfe37b110c634e88778c704/gistfile1.txt';
+// ========================================================
+
+const THEMES = [
+  { cls: 'theme-crimson', label: 'Crimson' },
+  { cls: 'theme-midnight', label: 'Midnight' },
+  { cls: 'theme-rose', label: 'Rose' },
+  { cls: 'theme-slate', label: 'Slate' },
+];
+
+const ALIGNS = [
+  { val: 'left', title: 'Left' },
+  { val: 'center', title: 'Center' },
+  { val: 'right', title: 'Right' },
+];
+
+let currentTheme = 'theme-crimson';
+let currentFontSize = 1.45;
+let currentAlign = 'center';
+let currentFont = "'Playfair Display', serif";
+
+// Build UI
+const themeGrid = document.getElementById('themeGrid');
+THEMES.forEach(t => {
+  const d = document.createElement('div');
+  d.className = `theme-dot ${t.cls}` + (t.cls === currentTheme ? ' active' : '');
+  d.title = t.label;
+  d.addEventListener('click', () => setTheme(t.cls));
+  themeGrid.appendChild(d);
+});
+
+const alignRow = document.getElementById('alignRow');
+ALIGNS.forEach(a => {
+  const b = document.createElement('button');
+  b.className = 'align-btn' + (a.val === currentAlign ? ' active' : '');
+  b.title = a.title;
+  b.innerHTML = a.val === 'left' ? '◀ ——' : a.val === 'center' ? '—◆—' : '—— ▶';
+  b.style.fontSize = '0.7rem';
+  b.style.letterSpacing = '1px';
+  b.dataset.align = a.val;
+  b.addEventListener('click', () => setAlign(a.val));
+  alignRow.appendChild(b);
+});
+
+// Font dropdown + Pacifico Lite
+const fontSelect = document.getElementById('fontSelect');
+fontSelect.value = currentFont;
+
+fontSelect.addEventListener('change', () => {
+  currentFont = fontSelect.value;
+  const postText = document.getElementById('postText');
+  postText.style.fontFamily = currentFont;
+
+  if (currentFont.includes('Pacifico')) {
+    postText.style.fontWeight = '400';
+  } else {
+    postText.style.fontWeight = '800';
+  }
+});
+
+// Size slider
+const sizeSlider = document.getElementById('sizeSlider');
+const sizeValue = document.getElementById('sizeValue');
+sizeSlider.value = currentFontSize;
+sizeValue.textContent = currentFontSize.toFixed(2) + 'rem';
+
+sizeSlider.addEventListener('input', () => {
+  currentFontSize = parseFloat(sizeSlider.value);
+  sizeValue.textContent = currentFontSize.toFixed(2) + 'rem';
+  document.getElementById('postText').style.fontSize = currentFontSize + 'rem';
+});
+
+// ==================== SINGLE # CAPTION BUTTON ====================
+document.getElementById('captionBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('captionBtn');
+  btn.style.opacity = '0.6';
+
+  try {
+    const [captionRes, ctaRes, hashtagRes] = await Promise.all([
+      fetch(CAPTION_GIST_URL),
+      fetch(CTA_GIST_URL),
+      fetch(HASHTAG_GIST_URL)
+    ]);
+
+    const captionText = await captionRes.text();
+    const ctaText = await ctaRes.text();
+    const hashtagText = await hashtagRes.text();
+
+    const captions = captionText.split('\n').map(l => l.trim()).filter(Boolean);
+    const ctas = ctaText.split('\n').map(l => l.trim()).filter(Boolean);
+    const hashtagsList = hashtagText.split('\n').map(l => l.trim()).filter(l => l.startsWith('#'));
+
+    if (captions.length === 0 || ctas.length === 0 || hashtagsList.length === 0) {
+      showToast('One of the lists is empty!');
+      return;
+    }
+
+    const randomCaption = captions[Math.floor(Math.random() * captions.length)];
+    const randomCTA = ctas[Math.floor(Math.random() * ctas.length)];
+    const randomHashtags = [...hashtagsList]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 5)
+      .join(' ');
+
+    const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
+
+    await navigator.clipboard.writeText(finalText);
+    showToast('Caption + CTA + Hashtags copied!');
+
+  } catch (err) {
+    showToast('Failed to generate content');
+    console.error(err);
+  } finally {
+    btn.style.opacity = '1';
+  }
+});
+
+function setTheme(cls) {
+  document.getElementById('postCard').className = `post-card ${cls}`;
+  document.querySelectorAll('.theme-dot').forEach(d => {
+    d.classList.toggle('active', d.classList.contains(cls));
+  });
+  currentTheme = cls;
+}
+
+function setAlign(align) {
+  document.getElementById('postText').style.textAlign = align;
+  document.querySelectorAll('.align-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.align === align);
+  });
+  currentAlign = align;
+}
+
+function syncText() {
+  const val = document.getElementById('textInput').value;
+  document.getElementById('postText').textContent = val;
+}
+
+document.getElementById('textInput').addEventListener('input', syncText);
+
+// Copy text button
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('textInput').value;
+  navigator.clipboard.writeText(text).then(() => showToast('📋 Text copied!'));
+});
+
+// Save image
+document.getElementById('saveBtn').addEventListener('click', saveImage);
+
+async function saveImage() {
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+
+  try {
+    const card = document.getElementById('postCard');
+    const canvas = await html2canvas(card, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+    });
+
+    const dataUrl = canvas.toDataURL('image/png');
+
+    if (navigator.share && navigator.canShare) {
+      try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], 'tharrkey_post.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'My Post — @tharrkey' });
+          showToast('🎉 Shared!');
+          return;
+        }
+      } catch(e) {}
+    }
+
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'tharrkey_post.png';
+    a.click();
+    showToast('✅ Image saved!');
+
+  } catch(e) {
+    showToast('❌ Error. Try again.');
+  } finally {
+    btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save`;
+    btn.disabled = false;
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Init
+const postText = document.getElementById('postText');
+postText.style.fontFamily = currentFont;
+postText.style.fontSize = currentFontSize + 'rem';
+
+if (currentFont.includes('Pacifico')) {
+  postText.style.fontWeight = '400';
+} else {
+  postText.style.fontWeight = '800';
+}
+
+syncText();
+</script>
 </body>
 </html>
