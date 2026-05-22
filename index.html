@@ -610,7 +610,7 @@ async function saveImage() {
         const file = new File([blob], 'tharrkey_post.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], title: 'My Post — @Tharrkey' });
-          showToast('🎉 Shared!');
+          showToast('📥 Saved!');
           return;
         }
       } catch(e) {}
