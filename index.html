@@ -10,7 +10,7 @@
     --bg: #0a0a0f;
     --surface: #12121a;
     --card: #1a1a26;
-    --accent: #3498db;           /* Changed to Blue */
+    --accent: #3498db;
     --accent2: #2980b9;
     --accent-glow: rgba(52, 152, 219, 0.35);
     --gold: #f1c40f;
@@ -111,9 +111,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    gap: 10px;
     padding-top: 8px;
   }
+
+  .post-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid rgba(255,255,255,0.25);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+  }
+
   .post-handle {
     font-size: 1.05rem;
     font-weight: 700;
@@ -134,6 +145,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #ffffff;
   }
   .post-text:empty::before {
     content: attr(data-placeholder);
@@ -294,6 +306,21 @@
   }
   .btn-caption:active { background: rgba(255,255,255,0.15); transform: scale(0.97); }
 
+  .btn-clear {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text);
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .btn-clear:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
     background: #1e1e2e; border: 1px solid rgba(255,255,255,0.12);
@@ -335,6 +362,7 @@
   <div class="preview-wrap">
     <div class="post-card theme-crimson" id="postCard">
       <div class="post-author">
+        <img src="t.png" class="post-avatar" alt="Profile Picture">
         <div class="post-handle" id="postHandle">@Tharrkey</div>
       </div>
       <div class="post-text" id="postText" data-placeholder="Write your thought here...">Write something amazing ✨</div>
@@ -343,7 +371,10 @@
 
   <!-- Text Input Panel -->
   <div class="panel">
-    <div class="panel-label">✏️ Your Text</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div class="panel-label">✏️ Your Text</div>
+      <button class="btn-clear" id="clearBtn">Clear</button>
+    </div>
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
   </div>
 
@@ -473,7 +504,13 @@ sizeSlider.addEventListener('input', () => {
   document.getElementById('postText').style.fontSize = currentFontSize + 'rem';
 });
 
-// ==================== SINGLE # CAPTION BUTTON ====================
+// Clear button
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('textInput').value = '';
+  document.getElementById('postText').textContent = '';
+});
+
+// # Caption button
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
@@ -572,7 +609,7 @@ async function saveImage() {
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], 'tharrkey_post.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'My Post — @tharrkey' });
+          await navigator.share({ files: [file], title: 'My Post — @Tharrkey' });
           showToast('🎉 Shared!');
           return;
         }
