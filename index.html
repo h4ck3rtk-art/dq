@@ -593,12 +593,18 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
+
+  // CORS proxy allows fetching GitHub Gist raw URLs from the browser
+  const CORS_PROXY = 'https://corsproxy.io/?url=';
+
+  const proxyFetch = (url) => fetch(CORS_PROXY + encodeURIComponent(url));
 
   try {
     const [captionRes, ctaRes, hashtagRes] = await Promise.all([
-      fetch(CAPTION_GIST_URL),
-      fetch(CTA_GIST_URL),
-      fetch(HASHTAG_GIST_URL)
+      proxyFetch(CAPTION_GIST_URL),
+      proxyFetch(CTA_GIST_URL),
+      proxyFetch(HASHTAG_GIST_URL)
     ]);
 
     const captionText = await captionRes.text();
@@ -631,6 +637,7 @@ document.getElementById('captionBtn').addEventListener('click', async () => {
     console.error(err);
   } finally {
     btn.style.opacity = '1';
+    btn.textContent = '# Caption';
   }
 });
 
