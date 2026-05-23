@@ -366,6 +366,63 @@
     height: 1px; background: var(--border); margin: 2px 0;
   }
 
+
+  .caption-panel-label {
+    font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .caption-field {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 400;
+    padding: 10px 12px;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .caption-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .btn-copy-all {
+    width: 100%; padding: 13px 0;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #8e44ad, #6c3483);
+    color: white; font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(142,68,173,0.35);
+    transition: opacity 0.15s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+  }
+  .btn-copy-all:active { opacity: 0.8; transform: scale(0.97); }
+  .caption-header {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .btn-regenerate {
+    background: rgba(142,68,173,0.15);
+    border: 1px solid #8e44ad;
+    color: #c39bd3;
+    font-size: 0.72rem;
+    padding: 5px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-regenerate:active { transform: scale(0.95); opacity: 0.8; }
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
@@ -418,8 +475,35 @@
         Save
       </button>
       <button class="btn-paste" id="pasteBtn" title="Paste from clipboard">📥</button>
-      <button class="btn-caption" id="captionBtn"># Caption</button>
     </div>
+  </div>
+
+
+  <!-- Caption Panel -->
+  <div class="panel" id="captionPanel">
+    <div class="caption-header">
+      <div class="panel-label">📝 Caption Kit</div>
+      <button class="btn-regenerate" id="regenBtn">🔄 Regenerate</button>
+    </div>
+
+    <div>
+      <div class="caption-panel-label">Caption</div>
+      <textarea class="caption-field" id="captionField" rows="3" placeholder="Loading..."></textarea>
+    </div>
+
+    <div>
+      <div class="caption-panel-label">Call to Action</div>
+      <textarea class="caption-field" id="ctaField" rows="2" placeholder="Loading..."></textarea>
+    </div>
+
+    <div>
+      <div class="caption-panel-label">Hashtags (5 random)</div>
+      <textarea class="caption-field" id="hashtagField" rows="2" placeholder="Loading..."></textarea>
+    </div>
+
+    <button class="btn-copy-all" id="copyAllBtn">
+      📋 Copy Caption + CTA + Hashtags
+    </button>
   </div>
 
   <!-- Theme Panel -->
@@ -603,52 +687,105 @@ async function safeFetchLines(url, isHashtag = false) {
   }
 }
 
-// # Caption button — fetches one by one, uses fallback if any list fails
-document.getElementById('captionBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('captionBtn');
-  btn.style.opacity = '0.6';
-  btn.textContent = '⏳';
+// Cached gist data (loaded once, reused on regenerate)
+let gistCaptions = [];
+let gistCTAs = [];
+let gistHashtags = [];
+let gistLoaded = false;
 
-  // Sequential fetches — each independent, one failure never breaks others
+async function loadGistData() {
   const captions     = await safeFetchLines(CAPTION_GIST_URL);
   const ctas         = await safeFetchLines(CTA_GIST_URL);
   const hashtagsList = await safeFetchLines(HASHTAG_GIST_URL, true);
 
-  // Per-list fallbacks so button always works even if gist is unreachable
-  const finalCaptions = captions.length > 0 ? captions : [
+  gistCaptions = captions.length > 0 ? captions : [
     "Some things are better felt than explained. 🌙",
     "Silence says what words can't. 🖤",
     "Not everyone deserves your energy. ✨",
     "Soft heart. Strong mind. Wild soul. 🌿",
     "The moon doesn't apologize for being full. 🌕"
   ];
-  const finalCTAs = ctas.length > 0 ? ctas : [
+  gistCTAs = ctas.length > 0 ? ctas : [
     "Drop a ❤️ if this hit different.",
     "Tag someone who needs to see this.",
     "Save this for when you need a reminder. 🔖",
     "Follow for more vibes like this. ✨"
   ];
-  const finalHashtags = hashtagsList.length > 0 ? hashtagsList : [
+  gistHashtags = hashtagsList.length > 0 ? hashtagsList : [
     "#vibes", "#mindset", "#motivation", "#selflove", "#aesthetic",
     "#quotes", "#lifestyle", "#growth", "#healing", "#mood"
   ];
+  gistLoaded = true;
+}
 
-  const randomCaption  = finalCaptions[Math.floor(Math.random() * finalCaptions.length)];
-  const randomCTA      = finalCTAs[Math.floor(Math.random() * finalCTAs.length)];
-  const randomHashtags = [...finalHashtags].sort(() => 0.5 - Math.random()).slice(0, 5).join(' ');
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
-  const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
+function fillCaptionFields() {
+  document.getElementById('captionField').value  = pickRandom(gistCaptions);
+  document.getElementById('ctaField').value      = pickRandom(gistCTAs);
+  const randomHashtags = [...gistHashtags].sort(() => 0.5 - Math.random()).slice(0, 5).join(' ');
+  document.getElementById('hashtagField').value  = randomHashtags;
+}
 
-  try {
-    await navigator.clipboard.writeText(finalText);
-    showToast('📋 Caption copied!');
-  } catch (e) {
-    showToast('❌ Allow clipboard access in browser settings');
+// Load gist data on page load and fill fields
+(async () => {
+  await loadGistData();
+  fillCaptionFields();
+})();
+
+// Regenerate button — pick fresh random values
+document.getElementById('regenBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('regenBtn');
+  btn.textContent = '⏳';
+  btn.style.opacity = '0.6';
+  if (!gistLoaded) await loadGistData();
+  fillCaptionFields();
+  btn.textContent = '🔄 Regenerate';
+  btn.style.opacity = '1';
+});
+
+
+// Copy All button — reads from the editable textareas and copies
+document.getElementById('copyAllBtn').addEventListener('click', () => {
+  const caption  = document.getElementById('captionField').value.trim();
+  const cta      = document.getElementById('ctaField').value.trim();
+  const hashtags = document.getElementById('hashtagField').value.trim();
+
+  if (!caption && !cta && !hashtags) {
+    showToast('Nothing to copy yet!');
+    return;
   }
 
-  btn.style.opacity = '1';
-  btn.textContent = '# Caption';
+  const finalText = `${caption}\n\n${cta}\n\n${hashtags}`;
+
+  // Try clipboard API, fall back to execCommand for mobile
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(finalText)
+      .then(() => showToast('📋 Copied to clipboard!'))
+      .catch(() => fallbackCopy(finalText));
+  } else {
+    fallbackCopy(finalText);
+  }
 });
+
+function fallbackCopy(text) {
+  // Create a temporary textarea, select it, copy — works on mobile without permissions
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast('📋 Copied to clipboard!');
+  } catch (e) {
+    showToast('❌ Copy failed — please copy manually');
+  }
+  document.body.removeChild(ta);
+}
 
 function setTheme(cls) {
   document.getElementById('postCard').className = `post-card ${cls}`;
