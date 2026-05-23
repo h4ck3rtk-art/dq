@@ -290,7 +290,7 @@
     letter-spacing: 0.3px;
   }
   .btn-save:active { opacity: 0.8; transform: scale(0.97); box-shadow: 0 2px 10px var(--accent-glow); }
-  .btn-paste {
+  .btn-copy {
     width: 52px; height: 52px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.1);
@@ -300,7 +300,6 @@
     font-size: 1.2rem;
     transition: background 0.15s, transform 0.15s;
   }
-  .btn-paste:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
   .btn-caption {
     padding: 0 16px;
     height: 52px;
@@ -417,7 +416,7 @@
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Save
       </button>
-      <button class="btn-paste" id="pasteBtn" title="Paste from clipboard">📥</button>
+      <button class="btn-copy" id="copyBtn" title="Copy text">📋</button>
       <button class="btn-caption" id="captionBtn"># Caption</button>
     </div>
   </div>
@@ -432,10 +431,14 @@
   <div class="panel">
     <div class="panel-label">🔤 Font Family</div>
     <select class="font-select" id="fontSelect">
-      <option value="'Playfair Display', serif">Playfair Display</option>
-      <option value="'Pacifico', cursive">Pacifico</option>
-      <option value="'Montserrat', sans-serif">Montserrat</option>
-      <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+      <option value="'Great Vibes', cursive">Great Vibes ✨ — Ultra-elegant, flowing, premium cursive</option>
+      <option value="'Dancing Script', cursive">Dancing Script — Playful yet classy, flirty energy</option>
+      <option value="'Alex Brush', cursive">Alex Brush — Sophisticated, high-end, intimate</option>
+      <option value="'Pinyon Script', cursive">Pinyon Script — Delicate, thin, romantic & artistic</option>
+      <option value="'Playfair Display', serif">Playfair Display — Classic elegant serif</option>
+      <option value="'Pacifico', cursive">Pacifico — Bold & fun cursive</option>
+      <option value="'Montserrat', sans-serif">Montserrat — Clean modern sans</option>
+      <option value="'Bebas Neue', sans-serif">Bebas Neue — Strong display impact</option>
     </select>
 
     <div class="divider"></div>
@@ -644,21 +647,10 @@ function syncText() {
 
 document.getElementById('textInput').addEventListener('input', syncText);
 
-// Paste from clipboard button
-document.getElementById('pasteBtn').addEventListener('click', async () => {
-  try {
-    const text = await navigator.clipboard.readText();
-    if (text && text.trim()) {
-      document.getElementById('textInput').value = text;
-      syncText();
-      showToast('📥 Pasted!');
-    } else {
-      showToast('Clipboard is empty');
-    }
-  } catch (err) {
-    showToast('❌ Paste blocked — allow clipboard access in browser settings');
-    console.error(err);
-  }
+// Copy text button
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('textInput').value;
+  navigator.clipboard.writeText(text).then(() => showToast('📋 Text copied!'));
 });
 
 // ==================== FIXED SAVE IMAGE FUNCTION ====================
