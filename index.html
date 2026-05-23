@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tharrkey Post Creator</title>
+<title>Tharrkey Post Creator • Fixed</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -100,11 +100,14 @@
   }
   .post-card > * { position: relative; z-index: 1; }
 
+  /* FIXED: Reduced noise opacity from 0.5 → 0.18 for brighter exports */
   .post-card::after {
     content:'';
     position: absolute; inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 2; opacity: 0.5;
+    pointer-events: none; 
+    z-index: 2; 
+    opacity: 0.18;
   }
 
   .post-author {
@@ -125,13 +128,16 @@
     flex-shrink: 0;
   }
 
+  /* FIXED: Added strong text-shadow for better contrast on export */
   .post-handle {
     font-size: 1.05rem;
     font-weight: 700;
-    opacity: 0.95;
+    opacity: 0.98;
     letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.65);
   }
 
+  /* FIXED: Brighter text color + strong text-shadow for crisp, bright exports */
   .post-text {
     font-size: 1.45rem;
     font-weight: 800;
@@ -145,7 +151,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
+    color: #fafafa;
+    text-shadow: 
+      0 2px 10px rgba(0,0,0,0.75),
+      0 0 22px rgba(255,255,255,0.18);
   }
   .post-text:empty::before {
     content: attr(data-placeholder);
@@ -400,7 +409,7 @@
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
   </div>
 
-  <!-- Action Buttons Panel (Moved here) -->
+  <!-- Action Buttons Panel -->
   <div class="panel">
     <div class="action-row">
       <button class="btn-save" id="saveBtn">
@@ -476,7 +485,7 @@ let currentFontSize = 1.45;
 let currentAlign = 'center';
 let currentFont = "'Playfair Display', serif";
 
-// Build UI
+// Build Theme Grid
 const themeGrid = document.getElementById('themeGrid');
 THEMES.forEach(t => {
   const d = document.createElement('div');
@@ -486,6 +495,7 @@ THEMES.forEach(t => {
   themeGrid.appendChild(d);
 });
 
+// Build Alignment Buttons
 const alignRow = document.getElementById('alignRow');
 ALIGNS.forEach(a => {
   const b = document.createElement('button');
@@ -499,7 +509,7 @@ ALIGNS.forEach(a => {
   alignRow.appendChild(b);
 });
 
-// Font dropdown + Pacifico Lite
+// Font dropdown
 const fontSelect = document.getElementById('fontSelect');
 fontSelect.value = currentFont;
 
@@ -553,7 +563,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
     const randomLine = lines[Math.floor(Math.random() * lines.length)];
     document.getElementById('textInput').value = randomLine;
-    syncText(); // update preview
+    syncText();
     showToast('✨ One-liner generated!');
 
   } catch (err) {
@@ -565,7 +575,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   }
 });
 
-// # Caption button
+// # Caption button (Caption + CTA + Hashtags)
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
@@ -639,7 +649,7 @@ document.getElementById('copyBtn').addEventListener('click', () => {
   navigator.clipboard.writeText(text).then(() => showToast('📋 Text copied!'));
 });
 
-// Save image
+// ==================== FIXED SAVE IMAGE FUNCTION ====================
 document.getElementById('saveBtn').addEventListener('click', saveImage);
 
 async function saveImage() {
@@ -649,28 +659,36 @@ async function saveImage() {
 
   try {
     const card = document.getElementById('postCard');
+    
+    // FIXED: Higher scale + background fallback + better options for bright, crisp exports
     const canvas = await html2canvas(card, {
-      scale: 3,
+      scale: 4,                    // Increased from 3 → sharper output
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null,
+      backgroundColor: '#000000',  // Solid fallback so gradients render brightly
       logging: false,
+      width: card.offsetWidth,
+      height: card.offsetHeight,
+      scrollX: 0,
+      scrollY: 0
     });
 
-    const dataUrl = canvas.toDataURL('image/png');
+    const dataUrl = canvas.toDataURL('image/png', 1.0); // Maximum quality
 
+    // Try native share sheet first (iOS/Android)
     if (navigator.share && navigator.canShare) {
       try {
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], 'tharrkey_post.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], title: 'My Post — @Tharrkey' });
-          showToast('📥 Saved!');
+          showToast('📥 Saved to Photos!');
           return;
         }
       } catch(e) {}
     }
 
+    // Fallback: direct download
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = 'tharrkey_post.png';
@@ -678,6 +696,7 @@ async function saveImage() {
     showToast('✅ Image saved!');
 
   } catch(e) {
+    console.error(e);
     showToast('❌ Error. Try again.');
   } finally {
     btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save`;
