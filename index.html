@@ -589,51 +589,88 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   }
 });
 
+// ==================== INLINE FALLBACK DATA ====================
+// Used when gist fetch fails (CORS / network / mobile restrictions)
+const FALLBACK_CAPTIONS = [
+  "Some things are better felt than explained. 🌙",
+  "Silence says what words can't. 🖤",
+  "Not everyone deserves your energy. Choose wisely. ✨",
+  "Soft heart. Strong mind. Wild soul. 🌿",
+  "She wasn't looking for a knight. She was looking for a sword. ⚔️",
+  "The moon doesn't apologize for being full. 🌕",
+  "Healing isn't linear, but it's always worth it. 💫",
+  "Too real for a filtered world. 🌸",
+  "Your vibe is your most expensive accessory. 💎",
+  "Darling, you are the whole damn storm. 🌩️"
+];
+const FALLBACK_CTAS = [
+  "Drop a ❤️ if this hit different.",
+  "Tag someone who needs to see this.",
+  "Save this for when you need a reminder. 🔖",
+  "Share if you felt this in your soul.",
+  "Comment your thoughts below 👇",
+  "Follow for more vibes like this. ✨",
+  "Turn on post notifications so you never miss one. 🔔",
+  "Send this to someone silently. You know who. 👀"
+];
+const FALLBACK_HASHTAGS = [
+  "#vibes", "#mindset", "#motivation", "#selflove", "#aesthetic",
+  "#quotes", "#lifestyle", "#growth", "#healing", "#mood",
+  "#reels", "#instagram", "#viral", "#explore", "#fyp",
+  "#positivity", "#energy", "#innerpeace", "#soul", "#dailyquotes"
+];
+// ==============================================================
+
 // # Caption button (Caption + CTA + Hashtags)
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
   btn.textContent = '⏳';
 
-  // CORS proxy allows fetching GitHub Gist raw URLs from the browser
-  const CORS_PROXY = 'https://corsproxy.io/?url=';
+  // Try multiple CORS proxies in order, fall back to inline data
+  const PROXIES = [
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://thingproxy.freeboard.io/fetch/${url}`,
+  ];
 
-  const proxyFetch = (url) => fetch(CORS_PROXY + encodeURIComponent(url));
+  async function fetchWithFallback(url) {
+    for (const proxy of PROXIES) {
+      try {
+        const res = await fetch(proxy(url), { signal: AbortSignal.timeout(5000) });
+        if (res.ok) {
+          const text = await res.text();
+          // Reject if proxy returned an error response disguised as 200
+          if (text && !text.includes('not in allowlist') && !text.includes('error') && text.trim().length > 5) {
+            return text;
+          }
+        }
+      } catch (e) { /* try next proxy */ }
+    }
+    return null; // signal failure → use fallback
+  }
 
   try {
-    const [captionRes, ctaRes, hashtagRes] = await Promise.all([
-      proxyFetch(CAPTION_GIST_URL),
-      proxyFetch(CTA_GIST_URL),
-      proxyFetch(HASHTAG_GIST_URL)
+    const [captionText, ctaText, hashtagText] = await Promise.all([
+      fetchWithFallback(CAPTION_GIST_URL),
+      fetchWithFallback(CTA_GIST_URL),
+      fetchWithFallback(HASHTAG_GIST_URL)
     ]);
 
-    const captionText = await captionRes.text();
-    const ctaText = await ctaRes.text();
-    const hashtagText = await hashtagRes.text();
+    const captions   = captionText  ? captionText.split('\n').map(l => l.trim()).filter(Boolean)              : FALLBACK_CAPTIONS;
+    const ctas       = ctaText      ? ctaText.split('\n').map(l => l.trim()).filter(Boolean)                  : FALLBACK_CTAS;
+    const hashtagsList = hashtagText ? hashtagText.split('\n').map(l => l.trim()).filter(l => l.startsWith('#')) : FALLBACK_HASHTAGS;
 
-    const captions = captionText.split('\n').map(l => l.trim()).filter(Boolean);
-    const ctas = ctaText.split('\n').map(l => l.trim()).filter(Boolean);
-    const hashtagsList = hashtagText.split('\n').map(l => l.trim()).filter(l => l.startsWith('#'));
-
-    if (captions.length === 0 || ctas.length === 0 || hashtagsList.length === 0) {
-      showToast('One of the lists is empty!');
-      return;
-    }
-
-    const randomCaption = captions[Math.floor(Math.random() * captions.length)];
-    const randomCTA = ctas[Math.floor(Math.random() * ctas.length)];
-    const randomHashtags = [...hashtagsList]
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 5)
-      .join(' ');
+    const randomCaption  = captions[Math.floor(Math.random() * captions.length)];
+    const randomCTA      = ctas[Math.floor(Math.random() * ctas.length)];
+    const randomHashtags = [...hashtagsList].sort(() => 0.5 - Math.random()).slice(0, 5).join(' ');
 
     const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
 
     await navigator.clipboard.writeText(finalText);
-    showToast('Caption + CTA + Hashtags copied!');
+    showToast('📋 Caption + CTA + Hashtags copied!');
 
   } catch (err) {
-    showToast('Failed to generate content');
+    showToast('❌ Failed to copy — allow clipboard access');
     console.error(err);
   } finally {
     btn.style.opacity = '1';
