@@ -290,7 +290,7 @@
     letter-spacing: 0.3px;
   }
   .btn-save:active { opacity: 0.8; transform: scale(0.97); box-shadow: 0 2px 10px var(--accent-glow); }
-  .btn-copy {
+  .btn-paste {
     width: 52px; height: 52px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.1);
@@ -300,6 +300,7 @@
     font-size: 1.2rem;
     transition: background 0.15s, transform 0.15s;
   }
+  .btn-paste:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
   .btn-caption {
     padding: 0 16px;
     height: 52px;
@@ -416,7 +417,7 @@
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Save
       </button>
-      <button class="btn-copy" id="copyBtn" title="Copy text">📋</button>
+      <button class="btn-paste" id="pasteBtn" title="Paste from clipboard">📥</button>
       <button class="btn-caption" id="captionBtn"># Caption</button>
     </div>
   </div>
@@ -579,18 +580,13 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
-  btn.textContent = '⏳';
 
   try {
     const [captionRes, ctaRes, hashtagRes] = await Promise.all([
-      fetch(CAPTION_GIST_URL, { mode: 'cors' }),
-      fetch(CTA_GIST_URL, { mode: 'cors' }),
-      fetch(HASHTAG_GIST_URL, { mode: 'cors' })
+      fetch(CAPTION_GIST_URL),
+      fetch(CTA_GIST_URL),
+      fetch(HASHTAG_GIST_URL)
     ]);
-
-    if (!captionRes.ok || !ctaRes.ok || !hashtagRes.ok) {
-      throw new Error('One of the Gist requests failed');
-    }
 
     const captionText = await captionRes.text();
     const ctaText = await ctaRes.text();
@@ -601,7 +597,7 @@ document.getElementById('captionBtn').addEventListener('click', async () => {
     const hashtagsList = hashtagText.split('\n').map(l => l.trim()).filter(l => l.startsWith('#'));
 
     if (captions.length === 0 || ctas.length === 0 || hashtagsList.length === 0) {
-      showToast('Gist data is empty right now');
+      showToast('One of the lists is empty!');
       return;
     }
 
@@ -614,26 +610,14 @@ document.getElementById('captionBtn').addEventListener('click', async () => {
 
     const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
 
-    // Robust clipboard write
-    try {
-      await navigator.clipboard.writeText(finalText);
-    } catch (e) {
-      const ta = document.createElement('textarea');
-      ta.value = finalText;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-
+    await navigator.clipboard.writeText(finalText);
     showToast('Caption + CTA + Hashtags copied!');
 
   } catch (err) {
+    showToast('Failed to generate content');
     console.error(err);
-    showToast('❌ Couldn\'t load from Gists. Check internet or try again.');
   } finally {
     btn.style.opacity = '1';
-    btn.textContent = '# Caption';
   }
 });
 
@@ -660,10 +644,21 @@ function syncText() {
 
 document.getElementById('textInput').addEventListener('input', syncText);
 
-// Copy text button
-document.getElementById('copyBtn').addEventListener('click', () => {
-  const text = document.getElementById('textInput').value;
-  navigator.clipboard.writeText(text).then(() => showToast('📋 Text copied!'));
+// Paste from clipboard button
+document.getElementById('pasteBtn').addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text && text.trim()) {
+      document.getElementById('textInput').value = text;
+      syncText();
+      showToast('📥 Pasted!');
+    } else {
+      showToast('Clipboard is empty');
+    }
+  } catch (err) {
+    showToast('❌ Paste blocked — allow clipboard access in browser settings');
+    console.error(err);
+  }
 });
 
 // ==================== FIXED SAVE IMAGE FUNCTION ====================
