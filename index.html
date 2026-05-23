@@ -589,52 +589,65 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   }
 });
 
-// # Caption button (Caption + CTA + Hashtags)
+// Safe fetch — returns [] on any error, never throws
+async function safeFetchLines(url, isHashtag = false) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const text = await res.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    if (isHashtag) return lines.map(l => l.startsWith('#') ? l : '#' + l);
+    return lines;
+  } catch (e) {
+    return [];
+  }
+}
+
+// # Caption button — fetches one by one, uses fallback if any list fails
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
+
+  // Sequential fetches — each independent, one failure never breaks others
+  const captions     = await safeFetchLines(CAPTION_GIST_URL);
+  const ctas         = await safeFetchLines(CTA_GIST_URL);
+  const hashtagsList = await safeFetchLines(HASHTAG_GIST_URL, true);
+
+  // Per-list fallbacks so button always works even if gist is unreachable
+  const finalCaptions = captions.length > 0 ? captions : [
+    "Some things are better felt than explained. 🌙",
+    "Silence says what words can't. 🖤",
+    "Not everyone deserves your energy. ✨",
+    "Soft heart. Strong mind. Wild soul. 🌿",
+    "The moon doesn't apologize for being full. 🌕"
+  ];
+  const finalCTAs = ctas.length > 0 ? ctas : [
+    "Drop a ❤️ if this hit different.",
+    "Tag someone who needs to see this.",
+    "Save this for when you need a reminder. 🔖",
+    "Follow for more vibes like this. ✨"
+  ];
+  const finalHashtags = hashtagsList.length > 0 ? hashtagsList : [
+    "#vibes", "#mindset", "#motivation", "#selflove", "#aesthetic",
+    "#quotes", "#lifestyle", "#growth", "#healing", "#mood"
+  ];
+
+  const randomCaption  = finalCaptions[Math.floor(Math.random() * finalCaptions.length)];
+  const randomCTA      = finalCTAs[Math.floor(Math.random() * finalCTAs.length)];
+  const randomHashtags = [...finalHashtags].sort(() => 0.5 - Math.random()).slice(0, 5).join(' ');
+
+  const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
 
   try {
-    const [captionRes, ctaRes, hashtagRes] = await Promise.all([
-      fetch(CAPTION_GIST_URL),
-      fetch(CTA_GIST_URL),
-      fetch(HASHTAG_GIST_URL)
-    ]);
-
-    const captionText = await captionRes.text();
-    const ctaText = await ctaRes.text();
-    const hashtagText = await hashtagRes.text();
-
-    const captions = captionText.split('\n').map(l => l.trim()).filter(Boolean);
-    const ctas = ctaText.split('\n').map(l => l.trim()).filter(Boolean);
-
-    // Fix: handle hashtags with or without leading '#'
-    const rawHashtags = hashtagText.split('\n').map(l => l.trim()).filter(Boolean);
-    const hashtagsList = rawHashtags.map(l => l.startsWith('#') ? l : '#' + l);
-
-    if (captions.length === 0 || ctas.length === 0 || hashtagsList.length === 0) {
-      showToast(`Empty — C:${captions.length} CTA:${ctas.length} H:${hashtagsList.length}`);
-      return;
-    }
-
-    const randomCaption = captions[Math.floor(Math.random() * captions.length)];
-    const randomCTA = ctas[Math.floor(Math.random() * ctas.length)];
-    const randomHashtags = [...hashtagsList]
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 5)
-      .join(' ');
-
-    const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
-
     await navigator.clipboard.writeText(finalText);
-    showToast('Caption + CTA + Hashtags copied!');
-
-  } catch (err) {
-    showToast('Failed to generate content');
-    console.error(err);
-  } finally {
-    btn.style.opacity = '1';
+    showToast('📋 Caption copied!');
+  } catch (e) {
+    showToast('❌ Allow clipboard access in browser settings');
   }
+
+  btn.style.opacity = '1';
+  btn.textContent = '# Caption';
 });
 
 function setTheme(cls) {
