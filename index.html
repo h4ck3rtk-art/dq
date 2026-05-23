@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tharrkey Post Creator • Fixed</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&family=Great+Vibes&family=Dancing+Script&family=Alex+Brush&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
@@ -431,14 +431,10 @@
   <div class="panel">
     <div class="panel-label">🔤 Font Family</div>
     <select class="font-select" id="fontSelect">
-      <option value="'Great Vibes', cursive">Great Vibes ✨ — Ultra-elegant, flowing, premium cursive</option>
-      <option value="'Dancing Script', cursive">Dancing Script — Playful yet classy, flirty energy</option>
-      <option value="'Alex Brush', cursive">Alex Brush — Sophisticated, high-end, intimate</option>
-      <option value="'Pinyon Script', cursive">Pinyon Script — Delicate, thin, romantic & artistic</option>
-      <option value="'Playfair Display', serif">Playfair Display — Classic elegant serif</option>
-      <option value="'Pacifico', cursive">Pacifico — Bold & fun cursive</option>
-      <option value="'Montserrat', sans-serif">Montserrat — Clean modern sans</option>
-      <option value="'Bebas Neue', sans-serif">Bebas Neue — Strong display impact</option>
+      <option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Pacifico', cursive">Pacifico</option>
+      <option value="'Montserrat', sans-serif">Montserrat</option>
+      <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
     </select>
 
     <div class="divider"></div>
@@ -583,13 +579,18 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 document.getElementById('captionBtn').addEventListener('click', async () => {
   const btn = document.getElementById('captionBtn');
   btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
 
   try {
     const [captionRes, ctaRes, hashtagRes] = await Promise.all([
-      fetch(CAPTION_GIST_URL),
-      fetch(CTA_GIST_URL),
-      fetch(HASHTAG_GIST_URL)
+      fetch(CAPTION_GIST_URL, { mode: 'cors' }),
+      fetch(CTA_GIST_URL, { mode: 'cors' }),
+      fetch(HASHTAG_GIST_URL, { mode: 'cors' })
     ]);
+
+    if (!captionRes.ok || !ctaRes.ok || !hashtagRes.ok) {
+      throw new Error('One of the Gist requests failed');
+    }
 
     const captionText = await captionRes.text();
     const ctaText = await ctaRes.text();
@@ -600,7 +601,7 @@ document.getElementById('captionBtn').addEventListener('click', async () => {
     const hashtagsList = hashtagText.split('\n').map(l => l.trim()).filter(l => l.startsWith('#'));
 
     if (captions.length === 0 || ctas.length === 0 || hashtagsList.length === 0) {
-      showToast('One of the lists is empty!');
+      showToast('Gist data is empty right now');
       return;
     }
 
@@ -613,14 +614,26 @@ document.getElementById('captionBtn').addEventListener('click', async () => {
 
     const finalText = `${randomCaption}\n\n${randomCTA}\n\n${randomHashtags}`;
 
-    await navigator.clipboard.writeText(finalText);
+    // Robust clipboard write
+    try {
+      await navigator.clipboard.writeText(finalText);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = finalText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+
     showToast('Caption + CTA + Hashtags copied!');
 
   } catch (err) {
-    showToast('Failed to generate content');
     console.error(err);
+    showToast('❌ Couldn\'t load from Gists. Check internet or try again.');
   } finally {
     btn.style.opacity = '1';
+    btn.textContent = '# Caption';
   }
 });
 
