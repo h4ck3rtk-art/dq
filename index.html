@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tharrkey Post Creator • Fixed</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&family=Great+Vibes&family=Dancing+Script&family=Alex+Brush&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
@@ -432,6 +432,10 @@
     <div class="panel-label">🔤 Font Family</div>
     <select class="font-select" id="fontSelect">
       <option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Great Vibes', cursive">Great Vibes ✨</option>
+      <option value="'Dancing Script', cursive">Dancing Script</option>
+      <option value="'Alex Brush', cursive">Alex Brush</option>
+      <option value="'Pinyon Script', cursive">Pinyon Script</option>
       <option value="'Pacifico', cursive">Pacifico</option>
       <option value="'Montserrat', sans-serif">Montserrat</option>
       <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
@@ -509,20 +513,30 @@ ALIGNS.forEach(a => {
   alignRow.appendChild(b);
 });
 
-// Font dropdown
+// Font dropdown + helper for proper weight on cursive/unique fonts
 const fontSelect = document.getElementById('fontSelect');
 fontSelect.value = currentFont;
 
-fontSelect.addEventListener('change', () => {
-  currentFont = fontSelect.value;
+function applyFontStyle() {
   const postText = document.getElementById('postText');
   postText.style.fontFamily = currentFont;
 
-  if (currentFont.includes('Pacifico')) {
+  // Elegant script/cursive fonts look best at normal weight (not bold)
+  const scriptFonts = ['Pacifico', 'Great Vibes', 'Dancing Script', 'Alex Brush', 'Pinyon Script'];
+  const isScript = scriptFonts.some(f => currentFont.includes(f));
+
+  if (isScript) {
     postText.style.fontWeight = '400';
+  } else if (currentFont.includes('Bebas Neue')) {
+    postText.style.fontWeight = '400'; // display font, clean at regular
   } else {
-    postText.style.fontWeight = '800';
+    postText.style.fontWeight = '800'; // bold for Playfair / Montserrat impact
   }
+}
+
+fontSelect.addEventListener('change', () => {
+  currentFont = fontSelect.value;
+  applyFontStyle();
 });
 
 // Size slider
@@ -713,14 +727,8 @@ function showToast(msg) {
 
 // Init
 const postText = document.getElementById('postText');
-postText.style.fontFamily = currentFont;
 postText.style.fontSize = currentFontSize + 'rem';
-
-if (currentFont.includes('Pacifico')) {
-  postText.style.fontWeight = '400';
-} else {
-  postText.style.fontWeight = '800';
-}
+applyFontStyle();   // handles fontFamily + smart font-weight for new cursive fonts
 
 syncText();
 </script>
