@@ -350,6 +350,26 @@
     transform: scale(0.96);
   }
 
+  .btn-pickup {
+    background: rgba(231, 76, 140, 0.15);
+    border: 1px solid #e74c8c;
+    color: #f39cc0;
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn-pickup:hover {
+    background: rgba(231, 76, 140, 0.28);
+    transform: translateY(-1px);
+  }
+  .btn-pickup:active {
+    transform: scale(0.96);
+  }
+
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
     background: #1e1e2e; border: 1px solid rgba(255,255,255,0.12);
@@ -462,6 +482,7 @@
       <div style="display: flex; gap: 8px; align-items: center;">
         <button class="btn-clear" id="clearBtn">Clear</button>
         <button class="btn-generate" id="generateBtn">✨ Generate</button>
+        <button class="btn-pickup" id="pickupBtn">💘 Pick Up Lines</button>
       </div>
     </div>
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
@@ -536,10 +557,11 @@
 
 <script>
 // ==================== GIST LINKS ====================
-const CAPTION_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/b9683982694b53a52a71bcea1f8120ea/raw/91437ec06cde284c6966f29cc36f5c355a18a07c/capt.txt';
-const CTA_GIST_URL     = 'https://gist.githubusercontent.com/h4ck3rtk-art/24ce8ca77149ed9574db1f6a5a7aefe3/raw/98878ad48efee3ce86ca8589f3d737961d95229c/cta.txt';
-const HASHTAG_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/3189f50395467c0030029a9353fe4048/raw/f32e3a57ba23ab457dfe37b110c634e88778c704/gistfile1.txt';
-const ONELINER_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/5f48ea50221c1036afa82481448cea64/raw/14c50c50d72df4e9049922bcdcbf52304f87505b/tex1.txt';
+const CAPTION_GIST_URL  = 'https://gist.githubusercontent.com/h4ck3rtk-art/b9683982694b53a52a71bcea1f8120ea/raw/capt.txt';
+const CTA_GIST_URL      = 'https://gist.githubusercontent.com/h4ck3rtk-art/24ce8ca77149ed9574db1f6a5a7aefe3/raw/cta.txt';
+const HASHTAG_GIST_URL  = 'https://gist.githubusercontent.com/h4ck3rtk-art/3189f50395467c0030029a9353fe4048/raw/gistfile1.txt';
+const ONELINER_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/5f48ea50221c1036afa82481448cea64/raw/tex1.txt';
+const PICKUP_GIST_URL   = 'https://gist.githubusercontent.com/h4ck3rtk-art/c6ac20fbb3b0a2f3d174bd60f56562bf/raw/neq.txt';
 // ========================================================
 
 const THEMES = [
@@ -600,6 +622,38 @@ sizeSlider.addEventListener('input', () => {
   currentFontSize = parseFloat(sizeSlider.value);
   sizeValue.textContent = currentFontSize.toFixed(2) + 'rem';
   document.getElementById('postText').style.fontSize = currentFontSize + 'rem';
+});
+
+// Pick Up Lines button - random line from pick up lines gist
+document.getElementById('pickupBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('pickupBtn');
+  const originalText = btn.textContent;
+  btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
+
+  try {
+    const res = await fetch(PICKUP_GIST_URL);
+    if (!res.ok) throw new Error('Failed to fetch');
+    const text = await res.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    if (lines.length === 0) {
+      showToast('No lines found in gist!');
+      return;
+    }
+
+    const randomLine = lines[Math.floor(Math.random() * lines.length)];
+    document.getElementById('textInput').value = randomLine;
+    syncText();
+    showToast('💘 Pick up line loaded!');
+
+  } catch (err) {
+    showToast('Failed to fetch pick up lines');
+    console.error(err);
+  } finally {
+    btn.style.opacity = '1';
+    btn.textContent = originalText;
+  }
 });
 
 // Clear button
