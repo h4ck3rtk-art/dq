@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tharrkey/title>
+<title>Tharrkey Post Creator • Fixed</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Pacifico&family=Playfair+Display:wght@700&family=Great+Vibes&family=Dancing+Script&family=Alex+Brush&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -501,9 +501,14 @@
 
   <!-- Text Input Panel -->
   <div class="panel">
-    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-      <button class="btn-clear" id="clearBtn" style="flex:1; padding: 8px 0; font-size:0.82rem;">Clear</button>
-      <button class="btn-gen" id="genBtn" style="flex:1; padding: 8px 0; font-size:0.82rem;">🔥 Get me Line</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn-clear" id="clearBtn">Clear</button>
+        <button class="btn-gen" id="genBtn">🔥 Gen</button>
+        <button class="btn-generate" id="generateBtn">Generate</button>
+        <button class="btn-pickup" id="pickupBtn">💘 Pick Up Lines</button>
+      </div>
     </div>
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
   </div>
@@ -644,7 +649,37 @@ sizeSlider.addEventListener('input', () => {
   document.getElementById('postText').style.fontSize = currentFontSize + 'rem';
 });
 
+// Pick Up Lines button - random line from pick up lines gist
+document.getElementById('pickupBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('pickupBtn');
+  const originalText = btn.textContent;
+  btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
 
+  try {
+    const res = await fetch(PICKUP_GIST_URL);
+    if (!res.ok) throw new Error('Failed to fetch');
+    const text = await res.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    if (lines.length === 0) {
+      showToast('No lines found in gist!');
+      return;
+    }
+
+    const randomLine = lines[Math.floor(Math.random() * lines.length)];
+    document.getElementById('textInput').value = randomLine;
+    syncText();
+    showToast('💘 Pick up line loaded!');
+
+  } catch (err) {
+    showToast('Failed to fetch pick up lines');
+    console.error(err);
+  } finally {
+    btn.style.opacity = '1';
+    btn.textContent = originalText;
+  }
+});
 
 // Clear button
 document.getElementById('clearBtn').addEventListener('click', () => {
@@ -652,7 +687,37 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   document.getElementById('postText').textContent = '';
 });
 
+// Generate button - random one-liner from gist
+document.getElementById('generateBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('generateBtn');
+  const originalText = btn.textContent;
+  btn.style.opacity = '0.6';
+  btn.textContent = '⏳';
 
+  try {
+    const res = await fetch(ONELINER_GIST_URL);
+    if (!res.ok) throw new Error('Failed to fetch');
+    const text = await res.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    if (lines.length === 0) {
+      showToast('No lines found in gist!');
+      return;
+    }
+
+    const randomLine = lines[Math.floor(Math.random() * lines.length)];
+    document.getElementById('textInput').value = randomLine;
+    syncText();
+    showToast('✨ One-liner generated!');
+
+  } catch (err) {
+    showToast('Failed to generate from gist');
+    console.error(err);
+  } finally {
+    btn.style.opacity = '1';
+    btn.textContent = originalText;
+  }
+});
 
 // Safe fetch — returns [] on any error, never throws
 async function safeFetchLines(url, isHashtag = false) {
@@ -986,7 +1051,7 @@ function showToast(msg) {
       syncText();
       showToast('🔥 Erotic line generated!');
       btn.classList.remove('loading');
-      btn.textContent = '🔥 Get me Line';
+      btn.textContent = '🔥 Gen';
     }, 120);
   });
 })();
