@@ -331,6 +331,30 @@
     background: rgba(255,255,255,0.15);
   }
 
+  .btn-gen {
+    background: rgba(225, 29, 72, 0.15);
+    border: 1px solid #e11d48;
+    color: #f9a8c0;
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn-gen:hover {
+    background: rgba(225, 29, 72, 0.28);
+    transform: translateY(-1px);
+  }
+  .btn-gen:active {
+    transform: scale(0.96);
+  }
+  .btn-gen.loading {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
   .btn-generate {
     background: rgba(52, 152, 219, 0.15);
     border: 1px solid var(--accent);
@@ -481,6 +505,7 @@
     
       <div style="display: flex; gap: 8px; align-items: center;">
         <button class="btn-clear" id="clearBtn">Clear</button>
+        <button class="btn-gen" id="genBtn">🔥 Gen</button>
         <button class="btn-generate" id="generateBtn">Generate</button>
         <button class="btn-pickup" id="pickupBtn">💘 Pick Up Lines</button>
       </div>
@@ -909,6 +934,128 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
+
+// ==================== 🔥 GEN BUTTON: EROTIC LINE GENERATOR ====================
+(function() {
+  const openers = [
+    "Hey baby,", "Damn girl,", "You know what turns me on?", "I gotta tell you,",
+    "Fuck,", "Mmm come here,", "Honestly?", "Girl listen,", "I swear on everything,",
+    "Right now I need you to know,", "Baby I can't stop thinking about",
+    "You have no idea how bad I want to", "Tell me you want it too,",
+    "I bet you like it when I", "One thing about me — I love to",
+    "Come closer,", "I've been craving", "You make me so fucking",
+    "I need you to understand,", "Listen to me,", "You're making this hard for me,",
+    "I can't lie to you,", "Baby please,", "I've been waiting all day to tell you,",
+    "You have the kind of body that makes me want to", "I'm not even gonna lie,",
+    "Right now all I can think about is", "I want you to know something,",
+    "You're so fucking tempting that I", "Let me be real with you,",
+    "I've been good for too long,", "Something about you makes me want to"
+  ];
+  const adjectives = [
+    "wet", "tight", "throbbing", "naughty", "sweet", "dirty", "soft", "juicy",
+    "hot", "perfect", "addictive", "sensitive", "greedy", "playful", "teasing",
+    "slick", "warm", "aching", "delicious", "forbidden", "wild", "hungry",
+    "dripping", "swollen", "velvety", "glistening", "needy", "slippery", "pulsing",
+    "smooth", "silky", "ripe", "luscious", "tempting", "irresistible", "scorching"
+  ];
+  const verbs = [
+    "lick", "suck", "ride", "tease", "grab", "taste", "devour",
+    "kiss", "caress", "explore", "worship", "fill", "stretch",
+    "ruin", "please", "grind", "stroke", "nibble", "savor", "consume",
+    "dominate", "edge", "worship with my tongue", "own", "claim"
+  ];
+  const nouns = [
+    "lips", "body", "curves", "thighs", "mouth", "skin", "heat",
+    "wetness", "nipples", "folds", "entrance", "core", "peak", "bud"
+  ];
+  const bodyRefs = [
+    "your lips", "that ass", "your body", "every inch of you", "your pretty mouth",
+    "your soft skin", "between your legs", "your perfect curves", "your warm mouth",
+    "those soft thighs", "every curve of your body", "the heat between your legs"
+  ];
+  const closers = [
+    "all night long.", "until you're shaking.", "right fucking now.",
+    "until you beg for more.", "and I won't stop.", "until you scream my name.",
+    "slow and deep.", "just the way you like it.", "while you moan for me.",
+    "no holding back.", "till you can't take it anymore.", "and make you mine.",
+    "hard and rough.", "nice and slow.", "until you're dripping.",
+    "and leave you wanting more.", "every single night.", "until your legs give out.",
+    "while you lose control.", "and make you forget everything else.",
+    "deep and relentless.", "until you're trembling.", "and leave you satisfied."
+  ];
+  const templates = [
+    "{opener} your {body} looks so {adj} I just need to {verb} it {closer}",
+    "You have the most {adj} {noun} I've ever seen. Let me {verb} it {closer}",
+    "{opener} I want to {verb} you until you can't take it anymore {closer}",
+    "The way you look at me makes me want to {verb} your {body} {closer}",
+    "{opener} let's not pretend. I want to {verb} that {adj} {noun} {closer}",
+    "I can't stop imagining how good it would feel to {verb} your {body} {closer}",
+    "{opener} your {body} is driving me crazy. I need to {verb} it {closer}",
+    "You make me so {adj} I just want to {verb} your {noun} {closer}",
+    "I want to spend the whole night {verb}ing every part of your {body} {closer}",
+    "{opener} come here and let me {verb} that {adj} little {noun} {closer}",
+    "{opener} I've been dying to {verb} your {body} {closer}",
+    "Imagine me {verb}ing that {adj} {noun} of yours {closer}",
+    "{opener} you have no idea what I want to do to your {body} {closer}",
+    "I want to {verb} you slow then fast until you're begging {closer}",
+    "Let me {verb} every inch of your {body} {closer}",
+    "{opener} I need to taste how {adj} your {noun} is {closer}",
+    "You're so {adj} I want to {verb} you right here {closer}",
+    "{opener} I want to {verb} your {body} until you forget your name {closer}",
+    "{opener} your {body} was made for my hands {closer}",
+    "Let's skip the talking. I want to {verb} that {adj} {noun} {closer}",
+    "{opener} I can already tell you're going to feel so {adj} when I {verb} you {closer}",
+    "I want to {verb} every {adj} part of your {body} {closer}",
+    "{opener} be honest — you want me to {verb} your {body} {closer}",
+    "Let me {verb} every sensitive spot on your {body} {closer}",
+    "{opener} come here and let me worship your {body} with my tongue {closer}",
+    "{opener} you have the kind of {adj} {noun} that makes people weak {closer}",
+    "I want to {verb} you until you're completely undone {closer}",
+    "{opener} your {body} is so {adj} it's unfair {closer}",
+    "I want to {verb} you nice and slow while I watch you fall apart {closer}",
+    "{opener} I need to {verb} you until you're dripping and desperate {closer}"
+  ];
+
+  function _pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function _buildLine() {
+    let line = _pick(templates);
+    line = line.replace(/\{opener\}/g, () => _pick(openers));
+    line = line.replace(/\{adj\}/g,    () => _pick(adjectives));
+    line = line.replace(/\{verb\}/g,   () => _pick(verbs));
+    line = line.replace(/\{noun\}/g,   () => _pick(nouns));
+    line = line.replace(/\{body\}/g,   () => _pick(bodyRefs));
+    line = line.replace(/\{closer\}/g, () => _pick(closers));
+    return line.replace(/\s+/g, ' ').replace(/\s+([.,!?])/g, '$1').trim();
+  }
+
+  let _usedGen = new Set();
+
+  function _generateLine() {
+    for (let i = 0; i < 10; i++) {
+      const line = _buildLine();
+      if (!_usedGen.has(line)) { _usedGen.add(line); return line; }
+    }
+    const fb = _buildLine();
+    _usedGen.add(fb);
+    return fb;
+  }
+
+  document.getElementById('genBtn').addEventListener('click', () => {
+    const btn = document.getElementById('genBtn');
+    btn.classList.add('loading');
+    btn.textContent = '⏳';
+    setTimeout(() => {
+      const line = _generateLine();
+      document.getElementById('textInput').value = line;
+      syncText();
+      showToast('🔥 Erotic line generated!');
+      btn.classList.remove('loading');
+      btn.textContent = '🔥 Gen';
+    }, 120);
+  });
+})();
+// ==================== END GEN BUTTON ====================
 
 // Init
 const postText = document.getElementById('postText');
