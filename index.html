@@ -100,7 +100,6 @@
   }
   .post-card > * { position: relative; z-index: 1; }
 
-  /* FIXED: Reduced noise opacity from 0.5 → 0.18 for brighter exports */
   .post-card::after {
     content:'';
     position: absolute; inset: 0;
@@ -128,7 +127,6 @@
     flex-shrink: 0;
   }
 
-  /* FIXED: Added strong text-shadow for better contrast on export */
   .post-handle {
     font-size: 1.05rem;
     font-weight: 700;
@@ -137,7 +135,6 @@
     text-shadow: 0 2px 8px rgba(0,0,0,0.65);
   }
 
-  /* FIXED: Brighter text color + strong text-shadow for crisp, bright exports */
   .post-text {
     font-size: 1.45rem;
     font-weight: 800;
@@ -301,98 +298,41 @@
     transition: background 0.15s, transform 0.15s;
   }
   .btn-paste:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
-  .btn-caption {
-    padding: 0 16px;
-    height: 52px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.06);
-    color: var(--text); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.95rem;
-    font-weight: 600;
-    transition: background 0.15s, transform 0.15s;
-    white-space: nowrap;
-  }
-  .btn-caption:active { background: rgba(255,255,255,0.15); transform: scale(0.97); }
 
   .btn-clear {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     color: var(--text);
-    font-size: 0.75rem;
-    padding: 5px 12px;
-    border-radius: 8px;
+    font-size: 0.82rem;
+    padding: 12px 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
-    font-weight: 500;
+    font-weight: 600;
+    text-align: center;
   }
-  .btn-clear:hover {
-    background: rgba(255,255,255,0.15);
-  }
+  .btn-clear:hover { background: rgba(255,255,255,0.15); }
+  .btn-clear:active { transform: scale(0.96); }
 
   .btn-gen {
     background: rgba(225, 29, 72, 0.15);
     border: 1px solid #e11d48;
     color: #f9a8c0;
-    font-size: 0.75rem;
-    padding: 5px 12px;
-    border-radius: 8px;
+    font-size: 0.82rem;
+    padding: 12px 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
     font-weight: 600;
+    text-align: center;
     white-space: nowrap;
   }
   .btn-gen:hover {
     background: rgba(225, 29, 72, 0.28);
     transform: translateY(-1px);
   }
-  .btn-gen:active {
-    transform: scale(0.96);
-  }
-  .btn-gen.loading {
-    opacity: 0.6;
-    cursor: wait;
-  }
-
-  .btn-generate {
-    background: rgba(52, 152, 219, 0.15);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-size: 0.75rem;
-    padding: 5px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 600;
-  }
-  .btn-generate:hover {
-    background: rgba(52, 152, 219, 0.25);
-    transform: translateY(-1px);
-  }
-  .btn-generate:active {
-    transform: scale(0.96);
-  }
-
-  .btn-pickup {
-    background: rgba(231, 76, 140, 0.15);
-    border: 1px solid #e74c8c;
-    color: #f39cc0;
-    font-size: 0.75rem;
-    padding: 5px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .btn-pickup:hover {
-    background: rgba(231, 76, 140, 0.28);
-    transform: translateY(-1px);
-  }
-  .btn-pickup:active {
-    transform: scale(0.96);
-  }
+  .btn-gen:active { transform: scale(0.96); }
+  .btn-gen.loading { opacity: 0.6; cursor: wait; }
 
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
@@ -409,7 +349,6 @@
   .divider {
     height: 1px; background: var(--border); margin: 2px 0;
   }
-
 
   .caption-panel-label {
     font-size: 0.7rem; font-weight: 600;
@@ -501,14 +440,9 @@
 
   <!-- Text Input Panel -->
   <div class="panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-    
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <button class="btn-clear" id="clearBtn">Clear</button>
-        <button class="btn-gen" id="genBtn">🔥 Gen</button>
-        <button class="btn-generate" id="generateBtn">Generate</button>
-        <button class="btn-pickup" id="pickupBtn">💘 Pick Up Lines</button>
-      </div>
+    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+      <button class="btn-clear" id="clearBtn" style="flex:1;">Clear</button>
+      <button class="btn-gen" id="genBtn" style="flex:1;">🔥 Get me Line</button>
     </div>
     <textarea class="text-input" id="textInput" placeholder="Type your thought, quote or mood...">Write something amazing ✨</textarea>
   </div>
@@ -523,7 +457,6 @@
       <button class="btn-paste" id="pasteBtn" title="Paste from clipboard">📥</button>
     </div>
   </div>
-
 
   <!-- Caption Panel -->
   <div class="panel" id="captionPanel">
@@ -560,7 +493,7 @@
 
   <!-- Style Panel -->
   <div class="panel">
-<div class="panel-label">📐 Text Size</div>
+    <div class="panel-label">📐 Text Size</div>
     <div class="size-slider-container">
       <input type="range" id="sizeSlider" class="size-slider" 
              min="0.9" max="2.6" step="0.05" value="1.45">
@@ -585,8 +518,6 @@
 const CAPTION_GIST_URL  = 'https://gist.githubusercontent.com/h4ck3rtk-art/b9683982694b53a52a71bcea1f8120ea/raw/capt.txt';
 const CTA_GIST_URL      = 'https://gist.githubusercontent.com/h4ck3rtk-art/24ce8ca77149ed9574db1f6a5a7aefe3/raw/cta.txt';
 const HASHTAG_GIST_URL  = 'https://gist.githubusercontent.com/h4ck3rtk-art/3189f50395467c0030029a9353fe4048/raw/gistfile1.txt';
-const ONELINER_GIST_URL = 'https://gist.githubusercontent.com/h4ck3rtk-art/5f48ea50221c1036afa82481448cea64/raw/tex1.txt';
-const PICKUP_GIST_URL   = 'https://gist.githubusercontent.com/h4ck3rtk-art/c6ac20fbb3b0a2f3d174bd60f56562bf/raw/neq.txt';
 // ========================================================
 
 const THEMES = [
@@ -649,74 +580,10 @@ sizeSlider.addEventListener('input', () => {
   document.getElementById('postText').style.fontSize = currentFontSize + 'rem';
 });
 
-// Pick Up Lines button - random line from pick up lines gist
-document.getElementById('pickupBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('pickupBtn');
-  const originalText = btn.textContent;
-  btn.style.opacity = '0.6';
-  btn.textContent = '⏳';
-
-  try {
-    const res = await fetch(PICKUP_GIST_URL);
-    if (!res.ok) throw new Error('Failed to fetch');
-    const text = await res.text();
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-
-    if (lines.length === 0) {
-      showToast('No lines found in gist!');
-      return;
-    }
-
-    const randomLine = lines[Math.floor(Math.random() * lines.length)];
-    document.getElementById('textInput').value = randomLine;
-    syncText();
-    showToast('💘 Pick up line loaded!');
-
-  } catch (err) {
-    showToast('Failed to fetch pick up lines');
-    console.error(err);
-  } finally {
-    btn.style.opacity = '1';
-    btn.textContent = originalText;
-  }
-});
-
 // Clear button
 document.getElementById('clearBtn').addEventListener('click', () => {
   document.getElementById('textInput').value = '';
   document.getElementById('postText').textContent = '';
-});
-
-// Generate button - random one-liner from gist
-document.getElementById('generateBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('generateBtn');
-  const originalText = btn.textContent;
-  btn.style.opacity = '0.6';
-  btn.textContent = '⏳';
-
-  try {
-    const res = await fetch(ONELINER_GIST_URL);
-    if (!res.ok) throw new Error('Failed to fetch');
-    const text = await res.text();
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-
-    if (lines.length === 0) {
-      showToast('No lines found in gist!');
-      return;
-    }
-
-    const randomLine = lines[Math.floor(Math.random() * lines.length)];
-    document.getElementById('textInput').value = randomLine;
-    syncText();
-    showToast('✨ One-liner generated!');
-
-  } catch (err) {
-    showToast('Failed to generate from gist');
-    console.error(err);
-  } finally {
-    btn.style.opacity = '1';
-    btn.textContent = originalText;
-  }
 });
 
 // Safe fetch — returns [] on any error, never throws
@@ -733,7 +600,7 @@ async function safeFetchLines(url, isHashtag = false) {
   }
 }
 
-// Cached gist data (loaded once, reused on regenerate)
+// Cached gist data
 let gistCaptions = [];
 let gistCTAs = [];
 let gistHashtags = [];
@@ -775,13 +642,13 @@ function fillCaptionFields() {
   document.getElementById('hashtagField').value  = randomHashtags;
 }
 
-// Load gist data on page load and fill fields
+// Load gist data on page load
 (async () => {
   await loadGistData();
   fillCaptionFields();
 })();
 
-// Regenerate button — pick fresh random values
+// Regenerate button
 document.getElementById('regenBtn').addEventListener('click', async () => {
   const btn = document.getElementById('regenBtn');
   btn.textContent = '⏳';
@@ -792,8 +659,7 @@ document.getElementById('regenBtn').addEventListener('click', async () => {
   btn.style.opacity = '1';
 });
 
-
-// Copy All button — reads from the editable textareas and copies
+// Copy All button
 document.getElementById('copyAllBtn').addEventListener('click', () => {
   const caption  = document.getElementById('captionField').value.trim();
   const cta      = document.getElementById('ctaField').value.trim();
@@ -806,7 +672,6 @@ document.getElementById('copyAllBtn').addEventListener('click', () => {
 
   const finalText = `${caption}\n\n${cta}\n\n${hashtags}`;
 
-  // Try clipboard API, fall back to execCommand for mobile
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(finalText)
       .then(() => showToast('📋 Copied to clipboard!'))
@@ -817,7 +682,6 @@ document.getElementById('copyAllBtn').addEventListener('click', () => {
 });
 
 function fallbackCopy(text) {
-  // Create a temporary textarea, select it, copy — works on mobile without permissions
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
@@ -873,7 +737,7 @@ document.getElementById('pasteBtn').addEventListener('click', async () => {
   }
 });
 
-// ==================== FIXED SAVE IMAGE FUNCTION ====================
+// Save Image
 document.getElementById('saveBtn').addEventListener('click', saveImage);
 
 async function saveImage() {
@@ -883,13 +747,11 @@ async function saveImage() {
 
   try {
     const card = document.getElementById('postCard');
-    
-    // FIXED: Higher scale + background fallback + better options for bright, crisp exports
     const canvas = await html2canvas(card, {
-      scale: 4,                    // Increased from 3 → sharper output
+      scale: 4,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#000000',  // Solid fallback so gradients render brightly
+      backgroundColor: '#000000',
       logging: false,
       width: card.offsetWidth,
       height: card.offsetHeight,
@@ -897,9 +759,8 @@ async function saveImage() {
       scrollY: 0
     });
 
-    const dataUrl = canvas.toDataURL('image/png', 1.0); // Maximum quality
+    const dataUrl = canvas.toDataURL('image/png', 1.0);
 
-    // Try native share sheet first (iOS/Android)
     if (navigator.share && navigator.canShare) {
       try {
         const blob = await (await fetch(dataUrl)).blob();
@@ -912,7 +773,6 @@ async function saveImage() {
       } catch(e) {}
     }
 
-    // Fallback: direct download
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = 'tharrkey_post.png';
@@ -935,7 +795,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ==================== 🔥 GEN BUTTON: EROTIC LINE GENERATOR ====================
+// ==================== 🔥 GEN BUTTON ====================
 (function() {
   const openers = [
     "Hey baby,", "Damn girl,", "You know what turns me on?", "I gotta tell you,",
@@ -1049,9 +909,9 @@ function showToast(msg) {
       const line = _generateLine();
       document.getElementById('textInput').value = line;
       syncText();
-      showToast('🔥 Erotic line generated!');
+      showToast('🔥 Generated!');
       btn.classList.remove('loading');
-      btn.textContent = '🔥 Gen';
+      btn.textContent = '🔥 Get me Line';
     }, 120);
   });
 })();
@@ -1060,8 +920,7 @@ function showToast(msg) {
 // Init
 const postText = document.getElementById('postText');
 postText.style.fontSize = currentFontSize + 'rem';
-applyFontStyle(); // handles fontFamily + correct weight for all new cursive fonts
-
+applyFontStyle();
 syncText();
 </script>
 </body>
