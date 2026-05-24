@@ -162,10 +162,10 @@
     font-style: italic;
   }
 
-  .theme-crimson { background: linear-gradient(145deg, #8b1a1a 0%, #c0392b 60%, #7b241c 100%); }
-  .theme-midnight { background: linear-gradient(145deg, #0d0221 0%, #1a1a2e 50%, #16213e 100%); }
   .theme-rose     { background: linear-gradient(145deg, #4a0010 0%, #a0003a 55%, #5a0020 100%); }
+  .theme-midnight { background: linear-gradient(145deg, #0d0221 0%, #1a1a2e 50%, #16213e 100%); }
   .theme-slate    { background: linear-gradient(145deg, #1a1f2e 0%, #2e3650 55%, #1a2030 100%); }
+  .theme-emerald  { background: linear-gradient(145deg, #022c22 0%, #064E3B 55%, #065f46 100%); }
 
   .panel {
     background: var(--card);
@@ -221,10 +221,10 @@
   }
   .theme-dot:active { transform: scale(0.93); }
 
-  .theme-dot.theme-crimson { background: linear-gradient(135deg, #8b1a1a, #c0392b); }
-  .theme-dot.theme-midnight { background: linear-gradient(135deg, #0d0221, #1a1a2e); }
   .theme-dot.theme-rose     { background: linear-gradient(135deg, #4a0010, #a0003a); }
+  .theme-dot.theme-midnight { background: linear-gradient(135deg, #0d0221, #1a1a2e); }
   .theme-dot.theme-slate    { background: linear-gradient(135deg, #1a1f2e, #2e3650); }
+  .theme-dot.theme-emerald  { background: linear-gradient(135deg, #022c22, #064E3B); }
 
   .font-select {
     width: 100%;
@@ -490,7 +490,7 @@
 
   <!-- Post Preview -->
   <div class="preview-wrap">
-    <div class="post-card theme-crimson" id="postCard">
+    <div class="post-card theme-rose" id="postCard">
       <div class="post-author">
         <img src="t.png" class="post-avatar" alt="Profile Picture">
         <div class="post-handle" id="postHandle">@Tharrkey</div>
@@ -590,10 +590,10 @@ const PICKUP_GIST_URL   = 'https://gist.githubusercontent.com/h4ck3rtk-art/c6ac2
 // ========================================================
 
 const THEMES = [
-  { cls: 'theme-crimson', label: 'Crimson' },
-  { cls: 'theme-midnight', label: 'Midnight' },
   { cls: 'theme-rose', label: 'Rose' },
+  { cls: 'theme-midnight', label: 'Midnight' },
   { cls: 'theme-slate', label: 'Slate' },
+  { cls: 'theme-emerald', label: 'Emerald' },
 ];
 
 const ALIGNS = [
@@ -602,7 +602,7 @@ const ALIGNS = [
   { val: 'right', title: 'Right' },
 ];
 
-let currentTheme = 'theme-crimson';
+let currentTheme = 'theme-rose';
 let currentFontSize = 1.45;
 let currentAlign = 'center';
 let currentFont = "'Montserrat', sans-serif";
